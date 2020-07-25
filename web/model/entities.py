@@ -1,25 +1,7 @@
 from sqlalchemy import Column, Integer, String, Sequence, DateTime, ForeignKey, Boolean, Float
 from sqlalchemy.orm import relationship
 from database import connector
-'''
-class User(connector.Manager.Base):
-    __tablename__ = 'users'
-    id = Column(Integer, Sequence('user_id_seq'), primary_key=True)
-    name = Column(String(50))
-    fullname = Column(String(50))
-    password = Column(String(12))
-    username = Column(String(12))
 
-class Message(connector.Manager.Base):
-    __tablename__ = 'messages'
-    id = Column(Integer, Sequence('message_id_seq'), primary_key=True)
-    content = Column(String(500))
-    sent_on = Column(DateTime(timezone=True))
-    user_from_id = Column(Integer, ForeignKey('users.id'))
-    user_to_id = Column(Integer, ForeignKey('users.id'))
-    user_from = relationship(User, foreign_keys=[user_from_id])
-    user_to = relationship(User, foreign_keys=[user_to_id])
-'''
 class Usuario(connector.Manager.Base):
     __tablename__ = 'usuarios'
     id = Column(Integer, Sequence('usuario_id_seq'), primary_key=True)
@@ -63,7 +45,7 @@ class Gato(connector.Manager.Base):
     id = Column(Integer, Sequence('gato_id_seq'), primary_key=True)
     albergue_id = Column(Integer, ForeignKey('albergues.id'))
     nombre = Column(String(15))
-    img = Column(String(30))
+    img = Column(String(200))
     edad = Column(Integer)
     adopcion = Column(Boolean)
     albergues_from = relationship(Albergue, foreign_keys=[albergue_id])

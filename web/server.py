@@ -1,4 +1,5 @@
-from flask import Flask,render_template, request, session, Response, redirect, jsonify
+from flask import Flask, render_template, request, session, Response, redirect, jsonify
+from flask_cors import CORS
 from database import connector
 from model import entities
 from werkzeug.utils import secure_filename
@@ -6,15 +7,22 @@ import json
 import time
 import os
 
+
 db = connector.Manager()
 engine = db.createEngine()
 
 app = Flask(__name__)
+CORS(app, supports_credentials=True)
 
 
-@app.route('/albergue', methods = ['POST'])
+@app.route('/albergue', methods=['POST'])
 def create_albergue():
-    create = json.loads(request.data)
+    #fotos = json.loads(request.files['data'])
+    print("---")
+    #print(fotos)
+    print("---")
+    create = json.loads(request.form['data'])
+    files = request.files
     session = db.getSession(engine)
     usuario = entities.Usuario(
         nombre = create["admin"]["nombre"],
@@ -67,13 +75,14 @@ def create_albergue():
             session.flush()
             temp = gato.id
             path = os.getcwd()
-            os.mkdir(path+"/gatos_imgs/"+str(gato.id))
-            foto = create[nombre]["img"]
+            os.mkdir(path + "/gatos_imgs/" + str(gato.id))
+            foto = files['files[' + str(i) + ']']
+            print(foto.filename)
             nombre_foto = secure_filename(foto.filename)
-            foto.save(path+"/gatos_imgs/"+str(gato.id)+"/", nombre_foto)
+            foto.save(path+"/gatos_imgs/"+str(gato.id)+"/"+ nombre_foto)
             session.commit()
             actualizar = session.query(entities.Gato).filter(entities.Gato.id == temp).first()
-            setattr(actualizar, 'img', path+"/gatos_imgs/"+str(gato.id)+"/", nombre_foto)
+            setattr(actualizar, 'img', path+"/gatos_imgs/"+str(gato.id)+"/"+ nombre_foto)
             session.commit()
     session.close()
     return "finalizado la inserción de datos :)"
