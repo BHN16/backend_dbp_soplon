@@ -127,7 +127,7 @@ def search_albergues():
         }
         lbrgs_rspns.append(res)
     return Response(json.dumps(lbrgs_rspns, cls=connector.AlchemyEncoder), mimetype='application/json')
-    
+
 @app.route('/borrar')
 def borrar():
     db.destroyTables(engine)
@@ -143,7 +143,9 @@ def delete_gato(id):
     return "Gato borrado"
     #crear gato, creo un file con el nombre de la carpeta 
 
-
+@app.route('/', methods=['GET'])
+def get_index():
+    return "HOLA YA SE SUBIO"
 
 '''
 @app.route('/read_users')
