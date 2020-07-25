@@ -17,10 +17,6 @@ CORS(app, supports_credentials=True)
 
 @app.route('/albergue', methods=['POST'])
 def create_albergue():
-    #fotos = json.loads(request.files['data'])
-    print("---")
-    #print(fotos)
-    print("---")
     create = json.loads(request.form['data'])
     files = request.files
     session = db.getSession(engine)
@@ -75,15 +71,15 @@ def create_albergue():
             session.flush()
             temp = gato.id
             path = os.getcwd()
-            os.mkdir(path + "/gatos_imgs/" + str(gato.id))
-            foto = files['files[' + str(i) + ']']
-            print(foto.filename)
-            nombre_foto = secure_filename(foto.filename)
-            foto.save(path+"/gatos_imgs/"+str(gato.id)+"/"+ nombre_foto)
+            #os.mkdir(path + "/gatos_imgs/" + str(gato.id))
+            #foto = files['files[' + str(i) + ']']
+            #print(foto.filename)
+            #nombre_foto = secure_filename(foto.filename)
+            #foto.save(path+"/gatos_imgs/"+str(gato.id)+"/"+ nombre_foto)
             session.commit()
-            actualizar = session.query(entities.Gato).filter(entities.Gato.id == temp).first()
-            setattr(actualizar, 'img', path+"/gatos_imgs/"+str(gato.id)+"/"+ nombre_foto)
-            session.commit()
+            #actualizar = session.query(entities.Gato).filter(entities.Gato.id == temp).first()
+            #setattr(actualizar, 'img', path+"/gatos_imgs/"+str(gato.id)+"/"+ nombre_foto)
+            #session.commit()
     session.close()
     return "finalizado la inserción de datos :)"
 
@@ -94,11 +90,32 @@ def search_gatos(id):
     gatos_from_id = db_session.query(entities.Gato).filter(entities.Gato.albergue_id == _id)
     db_session.close()
     gatos = gatos_from_id[:]
-    for gato in gatos:
-        print(gato.id)
     msg = {'gatos':gatos}
     return Response(json.dumps(msg, cls=connector.AlchemyEncoder), mimetype='application/json')
 
+@app.route('/get_albergues', methods = ['GET'])
+def search_albergues():
+    db_session = db.getSession(engine)
+    dbResponse = db_session.query(entities.Albergue)
+    albergues = dbResponse[:]#nombre del representante, telefono, nombre del albergue, albergan, ciudad, anios, numgatos, facebook, instagram, correo
+    lbrgs_rspns = []
+    for albergue in albergues:
+        admin = db_session.query(entities.Usuario).filter(entities.Usuario.id = albergue.admin_id)
+        res = {
+            'nombre':admin.nombre,
+            'telefono': admin.celular,
+            'nombre_albergue':albergue.nombre,
+            'albergan':albergue.albergan,
+            'cuidad':albergue.ciudad,
+            'anios':albergue.anios,
+            'num_gatos': albergue.num_gatos,
+            'facebook': albergue.facebook,
+            'instagram': albergue.instagram,
+            'correo': albergue.correo
+        }
+        lbrgs_rspns.append(res)
+    return Response(json.dumps(lbrgs_rspns, cls=connector.AlchemyEncoder), mimetype='application/json')
+    
 @app.route('/borrar')
 def borrar():
     db.destroyTables(engine)
