@@ -131,7 +131,9 @@ def delete_gato(id):
     return "Gato borrado"
     #crear gato, creo un file con el nombre de la carpeta 
 
-
+@app.route('/', methods=['GET'])
+def get_index():
+    return "HOLA YA SE SUBIO"
 
 '''
 @app.route('/read_users')
