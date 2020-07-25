@@ -1,6 +1,7 @@
 from flask import Flask,render_template, request, session, Response, redirect, jsonify
 from database import connector
 from model import entities
+from werkzeug.utils import secure_filename
 import json
 import time
 import os
@@ -58,7 +59,7 @@ def create_albergue():
             gato = entities.Gato(
                 albergue_id = albergue.id,
                 nombre = create[nombre]["nombre"],
-                img = create[nombre]["img"], #nombre de la imagen 
+                img = "", #nombre de la imagen 
                 edad = create[nombre]["edad"],
                 adopcion = create[nombre]["adopcion"]
             )
@@ -67,10 +68,12 @@ def create_albergue():
             temp = gato.id
             path = os.getcwd()
             os.mkdir(path+"/gatos_imgs/"+str(gato.id))
-            #TODO: guardar la imagen en el directorio creado
+            foto = create[nombre]["img"]
+            nombre_foto = secure_filename(foto.filename)
+            foto.save(path+"/gatos_imgs/"+str(gato.id)+"/", nombre_foto)
             session.commit()
             actualizar = session.query(entities.Gato).filter(entities.Gato.id == temp).first()
-            setattr(actualizar, 'img', "cambiorealizado")
+            setattr(actualizar, 'img', path+"/gatos_imgs/"+str(gato.id)+"/", nombre_foto)
             session.commit()
     session.close()
     return "finalizado la inserción de datos :)"
