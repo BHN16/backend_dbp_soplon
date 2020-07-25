@@ -98,9 +98,19 @@ def search_gatos(id):
 def get_gatos():
     db_session = db.getSession(engine)
     gatos_from_id = db_session.query(entities.Gato)
-    db_session.close()
     gatos = gatos_from_id[:]
-    msg = { 'gatos': gatos }
+    gatos_inst = []
+    for gato in gatos:
+        gato_inst = {}
+        albergue = db_session.query(entities.Albergue).filter(entities.Albergue.id == gato.albergue_id).first()
+        gato_inst['albergue'] = albergue.nombre
+        gato_inst['nombre'] = gato.nombre
+        gato_inst['edad'] = gato.edad
+        gato_inst['adopcion'] = gato.adopcion
+        gato_inst['img'] = gato.img
+        gatos_inst.append(gato_inst)
+    db_session.close()
+    msg = { 'gatos': gatos_inst }
     return Response(json.dumps(msg, cls=connector.AlchemyEncoder), mimetype='application/json')
 
 @app.route('/get_albergues', methods = ['GET'])
@@ -114,7 +124,7 @@ def search_albergues():
         admin = admin[:]
         admin = admin[0]
         res = {
-            'nombre':admin.nombre,
+            'nombre':admin.nombre + ' ' + admin.apellidos,
             'telefono': admin.celular,
             'nombre_albergue':albergue.nombre,
             'albergan':albergue.albergan,
