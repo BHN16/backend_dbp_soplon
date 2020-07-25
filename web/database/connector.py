@@ -9,7 +9,7 @@ class Manager:
     session = None
 
     def createEngine(self):
-        engine = create_engine('postgres+psycopg2://postgres:admin@localhost:5432/meowtec', echo=False)
+        engine = create_engine('postgres+psycopg2://postgres:4341450lj@localhost:5432/meowtec', echo=False)
         self.Base.metadata.create_all(engine)
         return engine
 

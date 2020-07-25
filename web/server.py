@@ -71,15 +71,16 @@ def create_albergue():
             session.flush()
             temp = gato.id
             path = os.getcwd()
-            #os.mkdir(path + "/gatos_imgs/" + str(gato.id))
-            #foto = files['files[' + str(i) + ']']
-            #print(foto.filename)
-            #nombre_foto = secure_filename(foto.filename)
-            #foto.save(path+"/gatos_imgs/"+str(gato.id)+"/"+ nombre_foto)
+            os.mkdir(path + "/gatos_imgs/" + str(gato.id))
+            foto = files['files[' + str(i) + ']']
+            print(foto.filename)
+            nombre_foto = secure_filename(foto.filename)
+            foto.save(path+"/gatos_imgs/"+str(gato.id)+"/"+ nombre_foto)
             session.commit()
-            #actualizar = session.query(entities.Gato).filter(entities.Gato.id == temp).first()
-            #setattr(actualizar, 'img', path+"/gatos_imgs/"+str(gato.id)+"/"+ nombre_foto)
-            #session.commit()
+            actualizar = session.query(entities.Gato).filter(entities.Gato.id == temp).first()
+            setattr(actualizar, 'img', path+"/gatos_imgs/"+str(gato.id)+"/"+ nombre_foto)
+            session.commit()
+    session.commit()
     session.close()
     return "finalizado la inserción de datos :)"
 
@@ -93,6 +94,15 @@ def search_gatos(id):
     msg = {'gatos':gatos}
     return Response(json.dumps(msg, cls=connector.AlchemyEncoder), mimetype='application/json')
 
+@app.route('/get_gatos', methods = ['GET'])
+def get_gatos():
+    db_session = db.getSession(engine)
+    gatos_from_id = db_session.query(entities.Gato)
+    db_session.close()
+    gatos = gatos_from_id[:]
+    msg = { 'gatos': gatos }
+    return Response(json.dumps(msg, cls=connector.AlchemyEncoder), mimetype='application/json')
+
 @app.route('/get_albergues', methods = ['GET'])
 def search_albergues():
     db_session = db.getSession(engine)
@@ -100,7 +110,9 @@ def search_albergues():
     albergues = dbResponse[:]#nombre del representante, telefono, nombre del albergue, albergan, ciudad, anios, numgatos, facebook, instagram, correo
     lbrgs_rspns = []
     for albergue in albergues:
-        admin = db_session.query(entities.Usuario).filter(entities.Usuario.id = albergue.admin_id)
+        admin = db_session.query(entities.Usuario).filter(entities.Usuario.id == albergue.admin_id)
+        admin = admin[:]
+        admin = admin[0]
         res = {
             'nombre':admin.nombre,
             'telefono': admin.celular,
