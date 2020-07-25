@@ -71,15 +71,15 @@ def create_albergue():
             session.flush()
             temp = gato.id
             path = os.getcwd()
-            #os.mkdir(path + "/gatos_imgs/" + str(gato.id))
-            #foto = files['files[' + str(i) + ']']
-            #print(foto.filename)
-            #nombre_foto = secure_filename(foto.filename)
-            #foto.save(path+"/gatos_imgs/"+str(gato.id)+"/"+ nombre_foto)
+            os.mkdir(path + "/gatos_imgs/" + str(gato.id))
+            foto = files['files[' + str(i) + ']']
+            print(foto.filename)
+            nombre_foto = secure_filename(foto.filename)
+            foto.save(path+"/gatos_imgs/"+str(gato.id)+"/"+ nombre_foto)
             session.commit()
-            #actualizar = session.query(entities.Gato).filter(entities.Gato.id == temp).first()
-            #setattr(actualizar, 'img', path+"/gatos_imgs/"+str(gato.id)+"/"+ nombre_foto)
-            #session.commit()
+            actualizar = session.query(entities.Gato).filter(entities.Gato.id == temp).first()
+            setattr(actualizar, 'img', path+"/gatos_imgs/"+str(gato.id)+"/"+ nombre_foto)
+            session.commit()
     session.close()
     return "finalizado la inserción de datos :)"
 
@@ -115,7 +115,7 @@ def search_albergues():
         }
         lbrgs_rspns.append(res)
     return Response(json.dumps(lbrgs_rspns, cls=connector.AlchemyEncoder), mimetype='application/json')
-    
+
 @app.route('/borrar')
 def borrar():
     db.destroyTables(engine)
